@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import uuidv4 from 'uuidv4';
+import List from './List';
 import './todo.css';
 
 class Todo extends Component {
@@ -7,7 +8,13 @@ class Todo extends Component {
         super();
         this.state = {
             task: '',
-            items: [
+            items: []
+        };
+    }
+
+    componentWillMount() {
+        this.setState({
+            items:[
                 {
                     id: uuidv4(),
                     task: 'Pay the rent',
@@ -24,11 +31,58 @@ class Todo extends Component {
                     completed: false
                 }
             ]
-        };
+        });
     }
 
-    componentWillMount() {
+    handleOnChange = e => {
+        const { target: { value } } = e;
+        this.setState({
+            task: value,
+        });
+    }
 
+    handleOnSubmit = e => {
+        e.preventDefault();
+
+        if(this.state.task.trim() !== '')
+        {
+            this.setState({
+                task: '',
+                items: [
+                    ...this.state.items,
+                    {
+                        id: uuidv4(),
+                        task: this.state.task,
+                        completed: false
+                    }
+                ]
+            });
+        }
+    }
+
+    markAsCompleted = (id) => {
+        const foundTask = this.state.items.find(
+            task => task.id === id
+        );
+
+        foundTask.completed = true;
+
+        this.setState({
+            items:[
+                ...this.state.items,
+                ...foundTask
+            ]
+        });
+    }
+
+    removeTask = (id) => {
+        const filteredTask = this.state.items.filter(
+            task => task.id !== id
+        );
+
+        this.setState({
+            items: filteredTask,
+        })
     }
 
     render() {
